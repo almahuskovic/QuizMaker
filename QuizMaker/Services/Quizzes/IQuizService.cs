@@ -1,6 +1,10 @@
-﻿namespace QuizMaker.Services.Quizzes
+﻿using QuizMaker.Model.DTO;
+using QuizMaker.Model.Requests.Quizzes;
+using QuizMaker.Services.BaseCRUD;
+
+namespace QuizMaker.Services.Quizzes
 {
-    public interface IQuizService
+    public interface IQuizService : IBaseCRUDService<QuizDto, QuizSearchRequest, QuizUpsertRequest, QuizUpsertRequest>
     {
     }
 }

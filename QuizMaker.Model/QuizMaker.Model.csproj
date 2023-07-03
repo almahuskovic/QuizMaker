@@ -4,10 +4,4 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="DTO\" />
-    <Folder Include="Entities\" />
-    <Folder Include="Requests\" />
-  </ItemGroup>
-
 </Project>

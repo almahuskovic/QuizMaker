@@ -1,4 +1,5 @@
 ﻿using QuizMaker.Model.BaseModels;
+using System;
 
 namespace QuizMaker.Model.DTO
 {
@@ -6,5 +7,6 @@ namespace QuizMaker.Model.DTO
     {
         public string Question { get; set; }
         public string Answear { get; set; }
+        public bool IsRecycled { get; set; }
     }
 }

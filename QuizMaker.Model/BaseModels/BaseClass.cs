@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuizMaker.Model.BaseModels
 {
@@ -12,5 +8,12 @@ namespace QuizMaker.Model.BaseModels
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
         public bool IsDeleted { get; set; }
+
+        public BaseClass()
+        {
+            CreatedAt = DateTime.Now;
+            ModifiedAt = DateTime.Now;
+            IsDeleted = false;
+        }
     }
 }

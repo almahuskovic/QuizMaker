@@ -13,5 +13,6 @@ namespace QuizMaker
         }
         public DbSet<Quiz> Quiz { get; set; }
         public DbSet<QuizQuestion> QuizQuestion { get; set; }
+        public DbSet<QuizzesQuestions> QuizzesQuestions { get; set; }
     }
 }

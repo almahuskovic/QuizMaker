@@ -23,7 +23,7 @@ namespace QuizMaker.Services.BaseCRUD
             return _mapper.Map<T>(entity);
         }
 
-        public T Update(Guid id, TUpdate request)
+        public T Update(Guid id, TUpdate request) //TODO:IActionResult
         {
             var set = Context.Set<TDb>();
             var entity = set.Find(id);

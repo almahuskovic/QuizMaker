@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using QuizMaker.Services.QuizQuestions;
 using QuizMaker.Services.Quizzes;
+using QuizMaker.Services.QuizzesQuestions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace QuizMaker
 
             services.AddScoped<IQuizService, QuizService>();
             services.AddScoped<IQuizQuestionService, QuizQuestionService>();
+            services.AddScoped<IQuizzesQuestionsService, QuizzesQuestionsService>();
 
             services.AddDbContext<Context>(options =>
                options.UseSqlServer(

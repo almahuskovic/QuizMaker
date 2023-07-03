@@ -14,7 +14,7 @@ namespace QuizMaker.Services.BaseRead
             Context = context;
             _mapper = mapper;
         }
-        public virtual IEnumerable<T> Get(TSearch search = null)
+        public virtual IEnumerable<T> Get(TSearch search = null, int page = 1, int pageSize = 10)
         {
             var entity = Context.Set<TDb>();
 
