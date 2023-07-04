@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuizMaker.Services.BaseCRUD;
 using System;
+using System.Threading.Tasks;
 
 namespace QuizMaker.Controllers.BaseControllers
 {
@@ -16,21 +17,21 @@ namespace QuizMaker.Controllers.BaseControllers
         }
 
         [HttpPost]
-        public T Insert([FromBody] TInsert request)
+        public async Task<T> Insert([FromBody] TInsert request)
         {
-            return _crudService.Insert(request);
+            return await _crudService.Insert(request);
         }
 
         [HttpPut("{id}")]
-        public T Update(Guid id, [FromBody] TUpdate request)
+        public async Task<T> Update(Guid id, [FromBody] TUpdate request)
         {
-            return _crudService.Update(id, request);
+            return await _crudService.Update(id, request);
         }
 
         [HttpDelete("{id}")]
-        public T Delete(Guid id)
+        public async Task<T> Delete(Guid id)
         {
-            return _crudService.Delete(id);
+            return await _crudService.Delete(id);
         }
     }
 }

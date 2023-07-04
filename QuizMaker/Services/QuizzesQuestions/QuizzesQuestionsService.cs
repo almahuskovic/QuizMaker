@@ -14,20 +14,22 @@ namespace QuizMaker.Services.QuizzesQuestions
         {
 
         }
-        public override IEnumerable<QuizzesQuestionsDto> Get(QuizzesQuestionsSearchRequest search = null, int page = 1, int pageSize = 10)
+        public override IEnumerable<QuizzesQuestionsDto> Get(QuizzesQuestionsSearchRequest search = null)
         {
-            var entity = Context.Set<Model.Entities.QuizzesQuestions>().AsQueryable();
+            var entity = Context.Set<Model.Entities.QuizzesQuestions>().AsQueryable().Where(x => !x.IsDeleted);
 
-            if (search.QuestionId.HasValue)//TODO:provjera za search
+            if (search.QuestionId.HasValue)//TODO:provjera za search nez da li skloniti ovaj if ili ga malo updateati
             {
+                entity = entity.Where(x => x.QuizQuestionId == search.QuestionId.Value);
                 entity = entity.Include(x => x.QuizQuestion);
             }
             if (search.QuizId.HasValue)
             {
-                entity = entity.Include(x => x.Quiz);
+                entity = entity.Where(x => x.QuizId == search.QuizId.Value);
+                entity = entity.Include(x => x.Quiz).Include(x => x.QuizQuestion);
             }
 
-            var mappedList = _mapper.Map<List<QuizzesQuestionsDto>>(entity).ToList();
+            var mappedList = _mapper.Map<List<QuizzesQuestionsDto>>(entity).Take(search.PageSize.Value).Skip((search.Page.Value - 1) * search.PageSize.Value).ToList();
 
             return mappedList;
         }

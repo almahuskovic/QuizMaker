@@ -14,7 +14,7 @@ namespace QuizMaker.Services.QuizQuestions
         {
 
         }
-        public override IEnumerable<QuizQuestionDto> Get(QuizQuestionSearchRequest search = null, int page = 1, int pageSize = 10)
+        public override IEnumerable<QuizQuestionDto> Get(QuizQuestionSearchRequest search = null)
         {
             var entity = Context.Set<QuizQuestion>().AsQueryable();
 
@@ -23,7 +23,7 @@ namespace QuizMaker.Services.QuizQuestions
                 entity = entity.Where(x => x.Question.ToLower().Contains(search.Question.ToLower()));
             }
 
-            var list = entity.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var list = entity.Take(search.PageSize.Value).Skip((search.Page.Value - 1) * search.PageSize.Value).ToList();
             var mappedList = _mapper.Map<List<QuizQuestionDto>>(list);
 
             return mappedList;
