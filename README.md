@@ -1,6 +1,6 @@
 # QuizMaker
 
-Projekt je kreiran u Visual Studio 2022, korišten je .NET 6. Za manipulaciju entitetima korišten je Automapper. Za komunikaciju s bazom korišten je Code first pristup.
+Projekt je kreiran u Visual Studio 2022, korišten je .NET 6. Za mapiranje entiteta korišten je Automapper. Za komunikaciju s bazom korišten je Code first pristup.
 Entiteti u bazi se kreiraju putem migracija. Za implementaciju exportera korišten je MEF (Managed Extensibility Framework).
 
 Za lakše snalaženje sa API-jem uključen je Swagger, a u nastavku ću obrazložiti dodatno.  
@@ -26,4 +26,3 @@ Za lakše snalaženje sa API-jem uključen je Swagger, a u nastavku ću obrazlo�
 *Export kviza*  
 
     GET metoda /quizzesquestions/export/{id}/{extension}, kojoj se prosljeđuje id kviza i ekstenzija. Poziv metode /quizzesquestions/exportformats će trenutno vratiti samo CVS format.
-    Fajl se spašava u Downloads folder na računar.
