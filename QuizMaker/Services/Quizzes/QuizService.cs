@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizMaker.Model.DTO;
 using QuizMaker.Model.Entities;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace QuizMaker.Services.Quizzes
 {
@@ -48,11 +50,11 @@ namespace QuizMaker.Services.Quizzes
 
             if (string.IsNullOrWhiteSpace(request.Name))
             {
-                return null;// HttpStatusCode.BadRequest;
+                throw new Exception("Bad request");
             }
             if (entity.Any(x => x.Name == request.Name))
             {
-                return null;//STATUS KOD da je isto ime poruka , mada nisam morala ??
+                throw new Exception("Already exists");
             }
 
             var mappedEntity = _mapper.Map<Quiz>(request);
@@ -61,9 +63,9 @@ namespace QuizMaker.Services.Quizzes
             foreach (var question in request.QuizQuestions)
             {
                 var questionId = question.Id;
-                if (!question.IsRecycled)//TODO:provjeriti da li mogu na osnovu Id-ja da pratim je li vec postojeci uzet
+                if (!question.IsRecycled)
                 {
-                    questionId = (await _quizQuestionService.Insert(new QuizQuestionUpsertRequest() { Question = question.Question, Answear = question.Answear })).Id;
+                    questionId = (await _quizQuestionService.Insert(new QuizQuestionUpsertRequest() { Question = question.Question, Answer = question.Answer })).Id;
                 }
 
                 await _quizzesQuestionsService.Insert(new QuizzesQuestionsUpsertRequest()
@@ -83,7 +85,7 @@ namespace QuizMaker.Services.Quizzes
             var entity = Context.Set<Quiz>().Find(id);
             if (entity == null)
             {
-                return null;//TODO:IActionResult ovo promijeniti
+                throw new Exception("Not found");
             }
 
             if (!entity.Name.Equals(request.Name))
@@ -98,7 +100,7 @@ namespace QuizMaker.Services.Quizzes
                 var quizQuestions = quizzesQuestions.Where(x => x.QuizId == id).Include(x => x.QuizQuestion).AsEnumerable();
 
                 var addedQuestions = quizQuestions.Any() ?
-                    request.QuizQuestions.Where(y => y.IsRecycled && !Guid.TryParse(y.Id.ToString(), out Guid g)) :
+                    request.QuizQuestions.Where(y => (y.IsRecycled && Guid.TryParse(y.Id.ToString(), out Guid g)) || y.Id == Guid.Empty) :
                     request.QuizQuestions;
 
                 foreach (var question in addedQuestions)
@@ -109,7 +111,7 @@ namespace QuizMaker.Services.Quizzes
                         var quizQuestion = await _quizQuestionService.Insert(new QuizQuestionUpsertRequest()
                         {
                             Question = question.Question,
-                            Answear = question.Answear
+                            Answer = question.Answer
                         });
                         qId = quizQuestion.Id;
                     }
@@ -121,32 +123,60 @@ namespace QuizMaker.Services.Quizzes
                     });
                 }
 
-                if (quizQuestions.Any())//visak??
+                var updatedQuestions = request.QuizQuestions.Where(y => quizQuestions.Any(x => x.QuizQuestionId == y.Id && !x.IsDeleted
+                    && (y.Question != x.QuizQuestion.Question || y.Answer != x.QuizQuestion.Answer)));
+
+                foreach (var question in updatedQuestions)
                 {
-                    var updatedQuestions = request.QuizQuestions.Where(y => quizQuestions.Any(x => x.QuizQuestionId == y.Id && !x.IsDeleted
-                        && (!y.Question.Equals(x.QuizQuestion.Question) || !y.Answear.Equals(x.QuizQuestion.Answear))));
-                    var deletedQuestions = request.QuizQuestions.Where(y => quizQuestions.Any(x => x.QuizQuestionId == y.Id && x.QuizQuestion.IsDeleted != y.IsDeleted));
-
-                    foreach (var question in updatedQuestions)
+                    await _quizQuestionService.Update(question.Id, new QuizQuestionUpsertRequest()
                     {
-                        await _quizQuestionService.Update(question.Id, new QuizQuestionUpsertRequest()
-                        {
-                            Question = question.Question,
-                            Answear = question.Answear
-                        });
-                    }
+                        Question = question.Question,
+                        Answer = question.Answer
+                    });
+                }
 
-                    foreach (var question in deletedQuestions)
+                var deletedQuestions = request.QuizQuestions.Where(y => quizQuestions.Any(x => x.QuizQuestionId == y.Id && x.QuizQuestion.IsDeleted != y.IsDeleted));
+
+                foreach (var question in deletedQuestions)
+                {
+                    if (!quizzesQuestions.Any(x => x.QuizQuestionId == question.Id && x.QuizId != id))
                     {
-                        if (!quizzesQuestions.Any(x => x.QuizQuestionId == question.Id && x.QuizId != id))
-                        {
-                            await _quizQuestionService.Delete(question.Id);
-                        }
-                        await _quizzesQuestionsService.Delete(quizQuestions.First(x => x.QuizQuestionId == question.Id).Id);
+                        await _quizQuestionService.Delete(question.Id);
                     }
+                    await _quizzesQuestionsService.Delete(quizQuestions.First(x => x.QuizQuestionId == question.Id).Id);
                 }
             }
 
+            return _mapper.Map<QuizDto>(entity);
+        }
+
+        public async override Task<QuizDto> Delete(Guid id, bool hardDelete = false)
+        {
+            var entity = Context.Set<Quiz>().Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Not found");
+            }
+
+            var quizzesQuestions = Context.Set<Model.Entities.QuizzesQuestions>().AsQueryable().Where(x => x.QuizId == id);
+
+            if (hardDelete)
+            {
+                Context.Remove(entity);
+                foreach (var item in quizzesQuestions)
+                {
+                    Context.Remove(item);
+                }
+            }
+            else
+            {
+                entity.IsDeleted = true;
+                foreach (var item in quizzesQuestions)
+                {
+                    item.IsDeleted = true;
+                }
+            }
+            await Context.SaveChangesAsync();
             return _mapper.Map<QuizDto>(entity);
         }
     }

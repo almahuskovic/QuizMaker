@@ -17,21 +17,56 @@ namespace QuizMaker.Controllers.BaseControllers
         }
 
         [HttpPost]
-        public async Task<T> Insert([FromBody] TInsert request)
+        public virtual async Task<ActionResult<T>> Insert([FromBody] TInsert request)
         {
-            return await _crudService.Insert(request);
+            try
+            {
+                return await _crudService.Insert(request);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<T> Update(Guid id, [FromBody] TUpdate request)
+        public virtual async Task<ActionResult<T>> Update(Guid id, [FromBody] TUpdate request)
         {
-            return await _crudService.Update(id, request);
+            try
+            {
+                return await _crudService.Update(id, request);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Not found")
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return BadRequest(ex);
+                }
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<T> Delete(Guid id)
+        public virtual async Task<ActionResult<T>> Delete(Guid id)
         {
-            return await _crudService.Delete(id);
+            try
+            {
+                return await _crudService.Delete(id);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Not found")
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return BadRequest(ex);
+                }
+            }
         }
     }
 }

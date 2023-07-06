@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using QuizMaker.Model.BaseModels;
 using QuizMaker.Services.BaseRead;
 using System;
-using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace QuizMaker.Services.BaseCRUD
@@ -26,19 +28,28 @@ namespace QuizMaker.Services.BaseCRUD
             return _mapper.Map<T>(entity);
         }
 
-        public async virtual Task<T> Update(Guid id, TUpdate request) //TODO:IActionResult
+        public async virtual Task<T> Update(Guid id, TUpdate request)
         {
             var set = Context.Set<TDb>();
             var entity = set.Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Not found");
+            }
 
             _mapper.Map(request, entity);
             await Context.SaveChangesAsync();
 
             return _mapper.Map<T>(entity);
         }
+        
         public async virtual Task<T> Delete(Guid id, bool hardDelete = false)
         {
             var entity = Context.Set<TDb>().Find(id);
+            if (entity == null)
+            {
+                throw new Exception("Not found");
+            }
 
             if (hardDelete)
             {
@@ -50,7 +61,8 @@ namespace QuizMaker.Services.BaseCRUD
             }
             await Context.SaveChangesAsync();
 
-            return _mapper.Map<T>(entity);
+            var mappedEntity = _mapper.Map<T>(entity);
+            return mappedEntity;
         }
     }
 }

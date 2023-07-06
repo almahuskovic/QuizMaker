@@ -5,6 +5,6 @@ namespace QuizMaker.Model.Entities
     public class QuizQuestion : BaseClass
     {
         public string Question { get; set; }
-        public string Answear { get; set; }
+        public string Answer { get; set; }
     }
 }

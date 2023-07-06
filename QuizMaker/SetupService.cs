@@ -25,24 +25,24 @@ namespace QuizMaker
 
             #region QuizQuestion
 
-            if (!context.QuizQuestion.Any(x => x.Question == "Šta se obilježava 25.11?"))
+            if (!context.QuizQuestion.Any(x => x.Question == "Koji je glavni grad Japana?"))
             {
                 context.QuizQuestion.Add(new QuizQuestion
                 {
-                    Question = "Šta se obilježava 25.11?",
-                    Answear = "Dan Državnosti BiH",
+                    Question = "Koji je glavni grad Japana?",
+                    Answer = "Tokyo",
                     CreatedAt = DateTime.Now,
                     ModifiedAt = DateTime.Now,
                     IsDeleted = false,
                 });
             }
 
-            if (!context.QuizQuestion.Any(x => x.Question == "Šta se obilježava 1.3?"))
+            if (!context.QuizQuestion.Any(x => x.Question == "Koji je najveci planinski vrh u BiH?"))
             {
                 context.QuizQuestion.Add(new QuizQuestion
                 {
-                    Question = "Šta se obilježava 1.3?",
-                    Answear = "Dan Nezavisnosti BiH",
+                    Question = "Koji je najveci planinski vrh u BiH?",
+                    Answer = "Maglic(2386m)",
                     CreatedAt = DateTime.Now,
                     ModifiedAt = DateTime.Now,
                     IsDeleted = false,
@@ -57,10 +57,36 @@ namespace QuizMaker
             var kviz1Id = context.Quiz.First(x => x.Name == "Kviz 1").Id;
             var kviz2Id = context.Quiz.First(x => x.Name == "Kviz 2").Id;
 
-            var q1Id = context.QuizQuestion.First(x => x.Question == "Šta se obilježava 25.11?").Id;
-            var q2Id = context.QuizQuestion.First(x => x.Question == "Šta se obilježava 1.3?").Id;
+            var q1Id = context.QuizQuestion.First(x => x.Question == "Koji je glavni grad Japana?").Id;
+            var q2Id = context.QuizQuestion.First(x => x.Question == "Koji je najveci planinski vrh u BiH?").Id;
 
-            //TODO:zavrsiti dodavanje podataka
+            context.QuizzesQuestions.Add(new QuizzesQuestions
+            {
+                QuizId= kviz1Id,
+                QuizQuestionId= q1Id,
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                IsDeleted = false,
+            });
+
+            context.QuizzesQuestions.Add(new QuizzesQuestions
+            {
+                QuizId = kviz1Id,
+                QuizQuestionId = q2Id,
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                IsDeleted = false,
+            });
+
+            context.QuizzesQuestions.Add(new QuizzesQuestions
+            {
+                QuizId = kviz2Id,
+                QuizQuestionId = q2Id,
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                IsDeleted = false,
+            });
+
             context.SaveChanges();
             #endregion
         }

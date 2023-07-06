@@ -9,6 +9,6 @@ namespace QuizMaker.Model.Requests.QuizQuestions
     public class QuizQuestionUpsertRequest
     {
         public string Question { get; set; }
-        public string Answear { get; set; }
+        public string Answer { get; set; }
     }
 }
